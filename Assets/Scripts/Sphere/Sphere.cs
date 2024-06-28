@@ -2,14 +2,17 @@ using UnityEngine;
 
 public class Sphere : MonoBehaviour
 {
+    public const int MAX_LEVEL = 11;
     public bool canMove { get; private set; } = false;
     private Vector3 direction = Vector3.zero;
     private float force = 0f;
     private float slowDownFactor = 0.9f;
     public float scale { get; private set; } = 0.35f;
-    private float sizeScaleFactor = 0.35f; 
+    private float sizeScaleFactor = 0.35f;
 
     private Renderer render;
+
+    [SerializeField] private GameObject visual;
 
     public int level { get; private set; } = 1;
 
@@ -44,16 +47,20 @@ public class Sphere : MonoBehaviour
 
         if (canMove)
         {
-            transform.position += direction * force * Time.fixedDeltaTime;
+            transform.position += new Vector3(direction.x, 0, direction.z) * force * Time.fixedDeltaTime;
+
+            transform.rotation = Quaternion.LookRotation(direction);
+            visual.transform.Rotate(Vector3.right, force);
+
         }
         force -= force * slowDownFactor * Time.fixedDeltaTime;
 
     }
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position + direction, (scale / 2));
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(transform.position + direction, (scale / 2));
+    //}
 
     private void CheckCollision()
     {
@@ -96,6 +103,11 @@ public class Sphere : MonoBehaviour
 
         if (!IsSameLevel(otherSphere))
         {
+            if(level == MAX_LEVEL)
+            {
+                Destroy(otherSphere.gameObject);
+                Destroy(gameObject);
+            }
             if (HasMoreForce(otherSphere))
             {
                 otherSphere.direction = direction;
@@ -127,12 +139,12 @@ public class Sphere : MonoBehaviour
         ScoreManager.instance.AddScore(level * 10);
         level++;
         scale += sizeScaleFactor;
+        GameManager.instance.PlaySound();
         UpdateColor();
     }
     public void SetLevel(int level)
     {
         this.level = level;
-        scale =+ (level - 1) * sizeScaleFactor;
-        UpdateColor();
+        scale = level * sizeScaleFactor;
     }
 }

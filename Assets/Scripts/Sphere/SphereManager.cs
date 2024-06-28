@@ -1,14 +1,18 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class SphereManager : MonoBehaviour
 {
     public static SphereManager instance { get; private set; }
+
+    public event Action<float> OnSurfaceChange;
+
     private Sphere m_Sphere;
     public GameObject spherePrefab;
     private Vector3 spawnPosition = new Vector3(0, 0, -3.2f);
 
+    public float surface { get; private set; } = 0;
     private void Start()
     {
         m_Sphere = Instantiate(spherePrefab, spawnPosition, spherePrefab.transform.rotation).GetComponent<Sphere>();
@@ -26,6 +30,9 @@ public class SphereManager : MonoBehaviour
     public void ApplyForce(Vector3 direction, float force)
     {
         if (m_Sphere == null) return;
+        if (GameManager.instance.isGamePause) return;
+
+        ScoreManager.instance.ResetCombot();
 
         // max force is 20
         force = Mathf.Clamp(force, 0, 20);
@@ -38,7 +45,7 @@ public class SphereManager : MonoBehaviour
 
     private IEnumerator SpawnSpherer()
     {
-        //int level = Random.Range(1, 4);
+        int level = UnityEngine.Random.Range(1, 6);
         yield return new WaitForSeconds(1.5f);
         // Liberate the zone before spawning a new one
         Collider[] colliders = Physics.OverlapSphere(spawnPosition, 1f);
@@ -52,19 +59,22 @@ public class SphereManager : MonoBehaviour
         }
 
         m_Sphere = Instantiate(spherePrefab, spawnPosition, spherePrefab.transform.rotation).GetComponent<Sphere>();
-        //m_Sphere.SetLevel(level);
+        m_Sphere.SetLevel(level);
         CalculeSurface();
     }
 
-    public int CalculeSurface()
+    public void CalculeSurface()
     {
         Sphere[] spheres = FindObjectsOfType<Sphere>();
-        float surface = 0;
+        surface = 0;
         foreach (var sphere in spheres)
         {
             surface += (Mathf.PI * Mathf.Pow(sphere.scale / 2, 2));
         }
-        Debug.Log(surface);
-        return (int)surface;
+        OnSurfaceChange?.Invoke(surface);
+        if (surface >= 75)
+        {
+            GameManager.instance.GameOver();
+        }
     }
 }
