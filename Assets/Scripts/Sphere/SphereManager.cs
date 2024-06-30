@@ -4,41 +4,41 @@ using UnityEngine;
 
 public class SphereManager : MonoBehaviour
 {
-    public static SphereManager instance { get; private set; }
+    public static SphereManager Instance { get; private set; }
 
     public event Action<float> OnSurfaceChange;
 
-    private Sphere m_Sphere;
-    public GameObject spherePrefab;
-    private Vector3 spawnPosition = new Vector3(0, 0, -3.2f);
+    private Sphere _sphere;
+    [SerializeField] private GameObject _spherePrefab;
+    private Vector3 _spawnPosition = new Vector3(0, 0, -3.2f);
 
     public float surface { get; private set; } = 0;
     private void Start()
     {
-        m_Sphere = Instantiate(spherePrefab, spawnPosition, spherePrefab.transform.rotation).GetComponent<Sphere>();
+        _sphere = Instantiate(_spherePrefab, _spawnPosition, _spherePrefab.transform.rotation).GetComponent<Sphere>();
     }
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Destroy(this);
             return;
         }
-        instance = this;
+        Instance = this;
     }
 
     public void ApplyForce(Vector3 direction, float force)
     {
-        if (m_Sphere == null) return;
-        if (GameManager.instance.isGamePause) return;
+        if (_sphere == null) return;
+        if (GameManager.Instance.isGamePause) return;
 
-        ScoreManager.instance.ResetCombot();
+        ScoreManager.Instance.ResetCombot();
 
         // max force is 20
         force = Mathf.Clamp(force, 0, 20);
 
-        m_Sphere.Move(direction, force);
-        m_Sphere = null;
+        _sphere.Move(direction, force);
+        _sphere = null;
 
         StartCoroutine(SpawnSpherer());
     }
@@ -48,7 +48,7 @@ public class SphereManager : MonoBehaviour
         int level = UnityEngine.Random.Range(1, 6);
         yield return new WaitForSeconds(1.5f);
         // Liberate the zone before spawning a new one
-        Collider[] colliders = Physics.OverlapSphere(spawnPosition, 1f);
+        Collider[] colliders = Physics.OverlapSphere(_spawnPosition, Sphere.SIZE_SCALE_FACTOR * level + 2);
         // Move all the spheres in the zone
         foreach (var collider in colliders)
         {
@@ -58,23 +58,32 @@ public class SphereManager : MonoBehaviour
             }
         }
 
-        m_Sphere = Instantiate(spherePrefab, spawnPosition, spherePrefab.transform.rotation).GetComponent<Sphere>();
-        m_Sphere.SetLevel(level);
+        _sphere = Instantiate(_spherePrefab, _spawnPosition, _spherePrefab.transform.rotation).GetComponent<Sphere>();
+        _sphere.SetLevel(level);
+    }
+    private void Update()
+    {
         CalculeSurface();
     }
-
     public void CalculeSurface()
     {
         Sphere[] spheres = FindObjectsOfType<Sphere>();
         surface = 0;
+
         foreach (var sphere in spheres)
         {
-            surface += (Mathf.PI * Mathf.Pow(sphere.scale / 2, 2));
+            if (sphere != null)
+            {
+                float radius = sphere.scale / 2;
+                surface += Mathf.PI * Mathf.Pow(radius, 2);
+            }
         }
+
         OnSurfaceChange?.Invoke(surface);
+
         if (surface >= 75)
         {
-            GameManager.instance.GameOver();
+            GameManager.Instance.GameOver();
         }
     }
 }

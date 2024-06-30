@@ -4,18 +4,18 @@ public class HightScore : MonoBehaviour
 {
     public int hightScore { get; private set; } = 0;
 
-    private const string fileName = "hightScore.txt";
+    private const string FILE_NAME = "hightScore.txt";
 
-    public static HightScore instance { get; private set; }
+    public static HightScore Instance { get; private set; }
 
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
         }
-        instance = this;
+        Instance = this;
     }
     void Start()
     {
@@ -24,16 +24,16 @@ public class HightScore : MonoBehaviour
 
     private void LoadHightScore()
     {
-        if (System.IO.File.Exists(fileName))
+        if (System.IO.File.Exists(FILE_NAME))
         {
-            string data = System.IO.File.ReadAllText(Application.dataPath + fileName);
+            string data = System.IO.File.ReadAllText(Application.dataPath + FILE_NAME);
             hightScore = int.Parse(data);
         }
     }
 
     private void SaveHightScore()
     {
-        System.IO.File.WriteAllText(Application.dataPath + fileName, hightScore.ToString());
+        System.IO.File.WriteAllText(Application.dataPath + FILE_NAME, hightScore.ToString());
     }
 
     public void UpdateHightScore(int score)

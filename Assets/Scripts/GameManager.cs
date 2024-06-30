@@ -4,31 +4,31 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance { get; private set; }
+    public static GameManager Instance { get; private set; }
     public bool isGamePause { get; private set; } = false;
 
-    private GameOverUI gameOverUI;
+    private GameOverUI _gameOverUI;
 
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
         }
 
-        instance = this;
+        Instance = this;
     }
     private void Start()
     {
-        gameOverUI = FindAnyObjectByType<GameOverUI>();
-        gameOverUI.gameObject.SetActive(false);
+        _gameOverUI = FindAnyObjectByType<GameOverUI>();
+        _gameOverUI.gameObject.SetActive(false);
     }
 
     public void GameOver()
     {
         isGamePause = true;
-        gameOverUI.gameObject.SetActive(true);
-        HightScore.instance.UpdateHightScore(ScoreManager.instance.score);
+        _gameOverUI.gameObject.SetActive(true);
+        HightScore.Instance.UpdateHightScore(ScoreManager.Instance.score);
     }
 
     public void Restart()

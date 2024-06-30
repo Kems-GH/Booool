@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class SphereColor
 {
-    public static Color[] colors = new Color[]
+    public static Color[] Colors = new Color[]
     {
         new Color(1f, 1f, 1f), // level 1 white
         new Color(0.996f, 0.506f, 0.49f), // level 2 red
@@ -17,4 +17,3 @@ public static class SphereColor
         new Color(0.988f, 0.494f, 0.988f), // level 11 pink
     };
 }
-

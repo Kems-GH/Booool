@@ -2,24 +2,24 @@ using UnityEngine;
 
 public class ScoreUI : MonoBehaviour
 {
-    [SerializeField] private TMPro.TextMeshProUGUI scoreText;
-    [SerializeField] private TMPro.TextMeshProUGUI combotText;
-    [SerializeField] private TMPro.TextMeshProUGUI hightScoreText;
+    [SerializeField] private TMPro.TextMeshProUGUI _scoreText;
+    [SerializeField] private TMPro.TextMeshProUGUI _combotText;
+    [SerializeField] private TMPro.TextMeshProUGUI _hightScoreText;
     private int scoreDisplay = 0;
 
     private void Start()
     {
-        hightScoreText.text = HightScore.instance.hightScore.ToString();
+        _hightScoreText.text = HightScore.Instance.hightScore.ToString();
     }
     void Update()
     {
-        if (scoreDisplay != ScoreManager.instance.score)
+        if (scoreDisplay != ScoreManager.Instance.score)
         {
             scoreDisplay++;
-            scoreText.text = scoreDisplay.ToString();
+            _scoreText.text = scoreDisplay.ToString();
         }
 
-        combotText.text = $"x{ScoreManager.instance.combot}";
+        _combotText.text = $"x{ScoreManager.Instance.combot}";
 
     }
 }

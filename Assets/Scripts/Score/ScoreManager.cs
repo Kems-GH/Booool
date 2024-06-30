@@ -3,16 +3,16 @@ using UnityEngine;
 public class ScoreManager : MonoBehaviour
 {
     public int score { get; private set; } = 0;
-    public static ScoreManager instance { get; private set; }
+    public static ScoreManager Instance { get; private set; }
     public int combot { get; private set; } = 1;
     private void Awake()
     {
-        if (instance != null)
+        if (Instance != null)
         {
             Destroy(this);
             return;
         }
-        instance = this;
+        Instance = this;
     }
     public void AddScore(int score)
     {
